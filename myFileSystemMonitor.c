@@ -108,29 +108,31 @@ int main(int argc, char **argv){
                 struct inotify_event *event = (struct inotify_event *) &buffer[i];
  		
                   if(event->len){
-                   if ( event->mask & IN_CREATE ) {
-                   if ( event->mask & IN_ISDIR ) {
-                     printf( "The directory %s was created.\n", event->name );	
-                     }
-                     else {
-                       printf( "The file %s was created.\n", event->name );
-                    }
-                    }
-                    else if ( event->mask & IN_DELETE ) {
-                    if ( event->mask & IN_ISDIR ) {
-                      printf( "The directory %s was deleted.\n", event->name );
-                    }
-                    else {
-                      printf( "The file %s was deleted.\n", event->name );
-                    }
-                    }
+               //    if ( event->mask & IN_CREATE ) {
+               //    if ( event->mask & IN_ISDIR ) {
+               //      printf( "The directory %s was created.\n", event->name );	
+               //       }
+               //      else {
+               //        printf( "The file %s was created.\n", event->name );
+               //     }
+               //     }
+               //     else if ( event->mask & IN_DELETE ) {
+               //     if ( event->mask & IN_ISDIR ) {
+               //       printf( "The directory %s was deleted.\n", event->name );
+               //     }
+               //     else {
+               //       printf( "The file %s was deleted.\n", event->name );
+               //     }
+               //     }
 
-                    else if ( event->mask & IN_MODIFY ) {
+                    if ( event->mask & IN_MODIFY ) {
                     if ( event->mask & IN_ISDIR ) {
                       printf( "The directory %s was modified.\n", event->name );
+		      print_to_apache("directory",event->name,"modified",ctime_string);	
                     }
                     else {
                      printf( "The file %s was modified.\n", event->name );
+		     print_to_apache("file",event->name,"modified",ctime_string);
                     }
                     }
 			
