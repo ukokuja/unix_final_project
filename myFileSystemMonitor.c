@@ -38,13 +38,11 @@ void print_to_apache(char *file_or_dir, char *file_name, char *event_name, char 
 }
 
 
-char* get_formatted_time() {
-    char ctime_string[TIME_SIZE];
+void get_formatted_time(char &ctime_string) {
     time_t current_time;
     time(&current_time);    // current_time = time(NULL);
-    struct tm *localtime = localtime(&rawtime);
+    struct tm *localtime = localtime(&current_time);
     strftime(ctime_string, sizeof(ctime_string), "%d %B %Y: %H:%M", localtime);
-    return ctime_string;
 }
 int main(int argc, char **argv) {
     signal(SIGINT, sig_handler);
@@ -68,11 +66,6 @@ int main(int argc, char **argv) {
                 exit(EXIT_FAILURE);
         }
     }
-
-    printf("flags=%d; directory=%s; IPaddress=%s; optind=%d\n",
-           flags, directory_to_be_watched, ip_address, optind); // TODO: Remove
-
-
 
 
     /* Step 1. Initialize inotify */
@@ -106,7 +99,8 @@ int main(int argc, char **argv) {
             struct inotify_event *event = (struct inotify_event *) &buffer[i];
 
             if (event->len) {
-                char ctime_string[TIME_SIZE] = get_formatted_time();
+                char ctime_string[TIME_SIZE];
+                get_formatted_time(ctime_string[TIME_SIZE]);
                 if (event->mask & IN_MODIFY) {
                     if (event->mask & IN_ISDIR) {
                         printf("The directory %s was modified.\n", event->name);
