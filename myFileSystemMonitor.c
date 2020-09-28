@@ -7,7 +7,6 @@
 #include <time.h>
 #include <unistd.h>
 #include <string.h>
-#include "time.c"
 
 #define MAX_EVENTS 1024  /* Maximum number of events to process*/
 #define LEN_NAME 25  /* Assuming that the length of the filename
