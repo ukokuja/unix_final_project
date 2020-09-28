@@ -12,15 +12,14 @@
 #define MAXLINE 1000
 
 // Driver code
-int main()
+int send_to_ip(char *ip, char* message)
 {
-    char *message = "Hello Server"; // TODO: This needs to come from the system monitor
     int sockfd, n;
     struct sockaddr_in servaddr;
 
     // clear servaddr
     bzero(&servaddr, sizeof(servaddr));
-    servaddr.sin_addr.s_addr = inet_addr("127.0.0.1"); //TODO: This needs to come from the system monitor
+    servaddr.sin_addr.s_addr = inet_addr(ip);
     servaddr.sin_port = htons(PORT);
     servaddr.sin_family = AF_INET;
 
