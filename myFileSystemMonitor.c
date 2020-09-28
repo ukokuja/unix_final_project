@@ -38,11 +38,12 @@ void print_to_apache(char *file_or_dir, char *file_name, char *event_name, char 
 }
 
 
-void get_formatted_time(char &ctime_string) {
+void get_formatted_time(char *ctime_string) {
     time_t current_time;
     time(&current_time);    // current_time = time(NULL);
-    struct tm *localtime = localtime(&current_time);
-    strftime(ctime_string, sizeof(ctime_string), "%d %B %Y: %H:%M", localtime);
+    struct tm *local_time;
+    local_time = localtime(&current_time);
+    strftime(ctime_string, TIME_SIZE, "%d %B %Y: %H:%M", local_time);
 }
 int main(int argc, char **argv) {
     signal(SIGINT, sig_handler);
@@ -100,7 +101,7 @@ int main(int argc, char **argv) {
 
             if (event->len) {
                 char ctime_string[TIME_SIZE];
-                get_formatted_time(ctime_string[TIME_SIZE]);
+                get_formatted_time(ctime_string);
                 if (event->mask & IN_MODIFY) {
                     if (event->mask & IN_ISDIR) {
                         printf("The directory %s was modified.\n", event->name);
