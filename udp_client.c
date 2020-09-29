@@ -12,9 +12,9 @@
 #define MAXLINE 1000
 
 // Driver code
-int send_to_ip(char *ip, char* message)
+void send_to_ip(char *ip, char* message)
 {
-    int sockfd, n;
+    int sockfd;
     struct sockaddr_in servaddr;
 
     // clear servaddr
