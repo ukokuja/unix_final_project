@@ -9,6 +9,7 @@
 #include <string.h>
 #include <pthread.h>
 #include "inotify.c"
+#include "telnet.c"
 
 /*buffer to store the data of events*/
 
@@ -44,7 +45,7 @@ int main(int argc, char **argv) {
     pthread_t thread_telnet;
     if (pthread_create(&thread_inotify, NULL, init_inotify, (void*)&p))
         return 1;
-    if (pthread_create(&thread_telnet, NULL, init_telnet, NULL);
+    if (pthread_create(&thread_telnet, NULL, init_telnet, NULL))
         return 1;
     pthread_join(thread_inotify, NULL);
     pthread_join(thread_telnet, NULL);
