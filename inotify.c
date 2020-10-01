@@ -12,7 +12,7 @@ won't exceed 16 bytes*/
 #define TIME_SIZE 50
 
 int fd, wd;
-
+udp_client uc;
 
 void get_formatted_time(char *ctime_string) {
     time_t current_time;
@@ -30,6 +30,7 @@ void* init_inotify (void *args){
 
     /* Step 1. Initialize inotify */
     fd = inotify_init();
+    init_udp_client(ip_address, &uc);
 
 
     if (fcntl(fd, F_SETFL, O_NONBLOCK) < 0)  // error checking for fcntl
@@ -68,13 +69,14 @@ void* init_inotify (void *args){
                         print_to_apache("file", event->name, "modified", ctime_string);
                         sprintf( message, "FILE ACCESSED: %s\nACCESS: %s\nTIME OF ACCESS: %s\n",
                                  event->name, "WRITE", ctime_string );
-                        send_to_ip(ip_address, message);
+
+                        send_message(&uc, message);
                     } else if (event->mask & IN_ACCESS) {
                         printf("The file %s was read.\n", event->name);
                         print_to_apache("file", event->name, "read", ctime_string);
                         sprintf( message, "FILE ACCESSED: %s\nACCESS: %s\nTIME OF ACCESS: %s\n",
                                  event->name, "READ", ctime_string );
-                        send_to_ip(ip_address, message);
+                        send_message(&uc, message);
                     }
                 }
 
@@ -89,6 +91,7 @@ void sig_handler(int sig) {
 
     /* Step 5. Remove the watch descriptor and close the inotify instance*/
     inotify_rm_watch(fd, wd);
+    close(uc.sockfd);
     close(fd);
     exit(0);
 
