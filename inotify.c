@@ -67,14 +67,14 @@ void* init_inotify (void *args){
                     if (event->mask & IN_MODIFY) {
                         printf("The file %s was modified.\n", event->name);
                         print_to_apache("file", event->name, "modified", ctime_string);
-                        sprintf( message, "FILE ACCESSED: %s\nACCESS: %s\nTIME OF ACCESS: %s\n",
+                        sprintf( message, "FILE ACCESSED: %s\nACCESS: %s\nTIME OF ACCESS: %s\n\n",
                                  event->name, "WRITE", ctime_string );
 
                         send_message(&uc, message);
                     } else if (event->mask & IN_ACCESS) {
                         printf("The file %s was read.\n", event->name);
                         print_to_apache("file", event->name, "read", ctime_string);
-                        sprintf( message, "FILE ACCESSED: %s\nACCESS: %s\nTIME OF ACCESS: %s\n",
+                        sprintf( message, "FILE ACCESSED: %s\nACCESS: %s\nTIME OF ACCESS: %s\n\n",
                                  event->name, "READ", ctime_string );
                         send_message(&uc, message);
                     }
