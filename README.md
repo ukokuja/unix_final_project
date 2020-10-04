@@ -8,4 +8,4 @@ UNIX Final Project for Shenkar College
 ## Execution
 1. ./main -d /tmp/here -i 127.0.0.1
 2. netcat -l -u -p 1234
-3. telnet localhost 8000
+3. telnet localhost 8000 (user: fred, password: nerk)
