@@ -79,7 +79,7 @@ void run_child(int x) {
 
 
     cli = cli_init();
-    cli_set_banner(cli, "Welcome from Omry, David and Lucas!");
+    cli_set_banner(cli, "Welcome.\nType 'help' to see all the possible commands");
     cli_set_hostname(cli, "File system monitor");
     cli_telnet_protocol(cli, 1);
     cli_regular(cli, regular_callback);
@@ -155,7 +155,7 @@ void* init_telnet (void *args){
 //        if (pid > 0) {
             socklen_t len = sizeof(addr);
             if (getpeername(x, (struct sockaddr *)&addr, &len) >= 0)
-                printf(" * accepted connection from %s\n", inet_ntoa(addr.sin_addr));
+//                printf(" * accepted connection from %s\n", inet_ntoa(addr.sin_addr));
 
 //            close(x);
 //            continue;

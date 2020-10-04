@@ -16,9 +16,6 @@
 
 backtrace bt;
 pthread_mutex_t lock;
-char is_thread_initializer (const char* source, const char* comp) {
-    return strcmp(source, comp) == 0;
-}
 void  __attribute__ ((no_instrument_function))  __cyg_profile_func_enter (void *this_fn,
                                                                           void *call_site)
 {
