@@ -42,7 +42,7 @@ void* init_inotify (void *args){
     if (wd == -1) {
         printf("Could not watch : %s\n", directory_to_be_watched);
     } else {
-        printf("Watching : %s\n", directory_to_be_watched);
+        printf("Watching: %s\n", directory_to_be_watched);
     }
 
 
@@ -65,16 +65,14 @@ void* init_inotify (void *args){
                 get_formatted_time(ctime_string);
                 if(!(event->mask & IN_ISDIR)) {
                     if (event->mask & IN_MODIFY) {
-                        printf("The file %s was modified.\n", event->name);
                         print_to_apache("file", event->name, "modified", ctime_string);
-                        sprintf( message, "FILE ACCESSED: %s\nACCESS: %s\nTIME OF ACCESS: %s\n\n",
+                        sprintf( message, "FILE ACCESSED: %s\nACCESS: %s\nTIME OF ACCESS: %s\n",
                                  event->name, "WRITE", ctime_string );
 
                         send_message(&uc, message);
                     } else if (event->mask & IN_ACCESS) {
-                        printf("The file %s was read.\n", event->name);
                         print_to_apache("file", event->name, "read", ctime_string);
-                        sprintf( message, "FILE ACCESSED: %s\nACCESS: %s\nTIME OF ACCESS: %s\n\n",
+                        sprintf( message, "FILE ACCESSED: %s\nACCESS: %s\nTIME OF ACCESS: %s\n",
                                  event->name, "READ", ctime_string );
                         send_message(&uc, message);
                     }
