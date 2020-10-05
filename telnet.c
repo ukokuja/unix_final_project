@@ -39,8 +39,7 @@ int init_backtrace(struct cli_def *cli, UNUSED(const char *command), UNUSED(char
     if (file) {
         char line[256];
         while (fgets(line, sizeof(line), file)) {
-            if (strncmp(line, "./main", 6) == 0)
-                cli_print(cli, "%s", line);
+            cli_print(cli, "%s", line);
         }
         fclose(file);
     }
@@ -102,7 +101,7 @@ void run_child(int x) {
     cli_regular_interval(cli, 5);
 
     // set 300 second idle timeout
-    cli_set_idle_timeout_callback(cli, 300, idle_timeout);
+    cli_set_idle_timeout_callback(cli, 180, idle_timeout);
 
 
     cli_register_command(cli, NULL, "backtrace", init_backtrace, PRIVILEGE_UNPRIVILEGED, MODE_EXEC,

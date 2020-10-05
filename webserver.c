@@ -1,9 +1,9 @@
 void open_new_session(parameters p){
   FILE *apacheSer = fopen("/var/www/html/index.html", "w");
-  fprintf(apacheSer, "<head><title>DIR_Watcher</title></head>");
-  fprintf(apacheSer, "<h1 style=%s > Wellcome   to   diractory  watcher </h1>","color:red;");
-  fprintf(apacheSer, "<h3 style='color: yellow'> &emsp; &emsp; &emsp; Made by  Lucas, David and Omri </h3> ");
-  fprintf(apacheSer, " <h2 style='color: green'> Directory to watch :  %s </h2> <br>" , p.directory_to_be_watched);
+  fprintf(apacheSer, "<head><title>My File System Monitor</title></head>");
+  fprintf(apacheSer, "<h1 style='color:red;' > Welcome to directory watcher </h1>");
+  fprintf(apacheSer, "<h3 style='color: yellow'> Made by  Lucas, David and Omri </h3> ");
+  fprintf(apacheSer, " <h2 style='color: green'> Directory to watch:  %s </h2> <br>" , p.directory_to_be_watched);
   fclose(apacheSer);
 }
 

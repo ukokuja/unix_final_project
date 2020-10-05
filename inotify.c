@@ -91,6 +91,4 @@ void sig_handler_inotify(int sig) {
     inotify_rm_watch(fd, wd);
     close(uc.sockfd);
     close(fd);
-    exit(0);
-
 }
