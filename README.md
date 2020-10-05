@@ -21,7 +21,7 @@ $ make install
 #### 2. Compiling
 ```shell script
 $ export LD_LIBRARY_PATH=/usr/local/lib
-$ gcc  myFileSystemMonitor.c  -lpthread -lcli -finstrument-functions  -rdynamic -ldl  -o main
+$ gcc  myFileSystemMonitor.c  -lpthread -lcli -finstrument-functions  -rdynamic  -o main
 $ sudo chmod 777 /var/www/html/index.html
 ```
 

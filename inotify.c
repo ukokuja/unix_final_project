@@ -1,4 +1,3 @@
-#include "parameters_struct.c"
 #include "webserver.c"
 #include "udp_client.c"
 
@@ -13,6 +12,7 @@ won't exceed 16 bytes*/
 
 int fd, wd;
 udp_client uc;
+
 
 void get_formatted_time(char *ctime_string) {
     time_t current_time;
@@ -85,7 +85,7 @@ void* init_inotify (void *args){
     }
 }
 
-void sig_handler(int sig) {
+void sig_handler_inotify(int sig) {
 
     /* Step 5. Remove the watch descriptor and close the inotify instance*/
     inotify_rm_watch(fd, wd);

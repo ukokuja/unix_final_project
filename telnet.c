@@ -1,4 +1,3 @@
-#include "backtrace_struct.c"
 
 #include <libcli.h>
 
@@ -14,7 +13,6 @@
 #include <string.h>
 #include <strings.h>
 #include <unistd.h>
-
 #include "libcli.h"
 
 // vim:sw=4 tw=120 et
@@ -30,18 +28,34 @@
 unsigned int regular_count = 0;
 unsigned int debug_regular = 0;
 
-struct my_context {
-    int value;
-    char *message;
-};
 
-backtrace* bt_p;
+backtrace_s* bt_p;
+
 
 int init_backtrace(struct cli_def *cli, UNUSED(const char *command), UNUSED(char *argv[]), UNUSED(int argc)) {
-    cli_print(cli, "Backtrace returned %d addresses\n", bt_p->trace_count);
-    for (int i = 0; i < bt_p->trace_count; i++) {
-        cli_print(cli, "%s", bt_p->trace[i]);
+    bt_p->is_active = 1;
+    cli_print(cli, "backtrace() returned %d addresses\n", bt_p->trace_count);
+    FILE* file = fopen(bt_p->buffer_filename, "r");
+    if (file) {
+        char line[256];
+        while (fgets(line, sizeof(line), file)) {
+            if (strncmp(line, "./main", 6) == 0)
+                cli_print(cli, "%s", line);
+        }
+        fclose(file);
     }
+    sem_post(&telnet_sem);
+
+//    c = fgetc(bt_p->trace);
+//    while (c != EOF)
+//    {
+//        c = fgetc(bt_p->trace);
+//        cli_print(cli, "%c", c);
+//    }
+//    for (int i = 0; i < bt_p->trace_count; i++) {
+//        if (is_not_from_libcli_thread(bt_p->trace[i]))
+//            cli_print(cli, "%s", bt_p->trace[i]);
+//    }
     return CLI_OK;
 }
 
@@ -87,8 +101,8 @@ void run_child(int x) {
     // change regular update to 5 seconds rather than default of 1 second
     cli_regular_interval(cli, 5);
 
-    // set 60 second idle timeout
-    cli_set_idle_timeout_callback(cli, 60, idle_timeout);
+    // set 300 second idle timeout
+    cli_set_idle_timeout_callback(cli, 300, idle_timeout);
 
 
     cli_register_command(cli, NULL, "backtrace", init_backtrace, PRIVILEGE_UNPRIVILEGED, MODE_EXEC,
@@ -112,11 +126,10 @@ void run_child(int x) {
 }
 
 void* init_telnet (void *args){
-    bt_p = ((backtrace *)args);
-    int s, x;
+    bt_p = ((backtrace_s *)args);
+    int s,x;
     struct sockaddr_in addr;
     int on = 1;
-
 
     signal(SIGCHLD, SIG_IGN);
 
@@ -145,24 +158,6 @@ void* init_telnet (void *args){
 
     printf("Listening on port %d\n", CLITEST_PORT);
     while ((x = accept(s, NULL, 0))) {
-//        int pid = fork();
-//        if (pid < 0) {
-//            perror("fork");
-//            return 1; // TODO: Check
-//        }
-
-        /* parent */
-//        if (pid > 0) {
-            socklen_t len = sizeof(addr);
-            if (getpeername(x, (struct sockaddr *)&addr, &len) >= 0)
-//                printf(" * accepted connection from %s\n", inet_ntoa(addr.sin_addr));
-
-//            close(x);
-//            continue;
-//        }
-
-        /* child */
-//        close(s);
         run_child(x);
         exit(0);
     }

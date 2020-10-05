@@ -10,28 +10,44 @@
 #include <unistd.h>
 #include <string.h>
 #include <pthread.h>
-#include "inotify.c"
-#include "telnet.c"
-#include <dlfcn.h>
+#include <execinfo.h>
+#include <semaphore.h>
+#include "backtrace_struct.c"
+#include "parameters_struct.c"
 
-backtrace bt;
-pthread_mutex_t lock;
+sem_t telnet_sem;
+backtrace_s bt;
+#define BACKTRACE_LENGTH 100
+#define BUFFER_FILENAME ".buffer.txt"
+void *backtrace_buffer[BACKTRACE_LENGTH];
+
 void  __attribute__ ((no_instrument_function))  __cyg_profile_func_enter (void *this_fn,
                                                                           void *call_site)
 {
-    Dl_info info_source;
-    Dl_info info_fn;
-    if (dladdr(call_site, &info_source) && dladdr(this_fn, &info_fn)) {
-        if (info_source.dli_sname && strcmp(info_source.dli_sname, "init_inotify") == 0) {
-            pthread_mutex_lock(&lock);
-            sprintf (bt.trace[bt.trace_count], "%d) %p [%s] %s",  bt.trace_count + 1, this_fn,
-                     info_fn.dli_fname ? info_fn.dli_fname : "?",
-                     info_fn.dli_sname ? info_fn.dli_sname : "?");
-            bt.trace_count++;
-            pthread_mutex_unlock(&lock);
+    if (bt.is_active == 1) {
+        sem_wait(&telnet_sem);
+        bt.trace_count = 0;
+        bt.is_active = 0;
+        FILE* file = fopen(BUFFER_FILENAME, "w");
+        if (file)
+            fclose(file);
+    }
+
+    int trace_count = backtrace(backtrace_buffer, BACKTRACE_LENGTH);
+    char** string = backtrace_symbols(backtrace_buffer, trace_count);
+    FILE* file = fopen(BUFFER_FILENAME, "a");
+    if (file) {
+        for (int j = 0; j < trace_count; j++) {
+            fprintf(file, "%s\n", string[j]);
         }
+        bt.trace_count = trace_count;
+        fclose(file);
     }
 }
+
+#include "inotify.c"
+#include "telnet.c"
+
 
 void fill_parameters(int argc, char **argv, parameters* p) {
     int opt;
@@ -53,20 +69,25 @@ void fill_parameters(int argc, char **argv, parameters* p) {
     }
 }
 
+void sig_handler(int sig) {
+
+    sem_close (&telnet_sem);
+}
+
+
 int main(int argc, char **argv) {
-    if (pthread_mutex_init(&lock, NULL) != 0)
-    {
-        printf("\n mutex init failed\n");
+
+    signal(SIGINT, sig_handler_inotify);
+    strcpy(bt.buffer_filename, BUFFER_FILENAME);
+    if (sem_init(&telnet_sem, 0, 0) == -1){
+        printf("sem_init failed\n");
         return 1;
     }
-
-    signal(SIGINT, sig_handler);
-
+    sem_post(&telnet_sem);
     parameters p;
 
     fill_parameters(argc, argv, &p);
     open_new_session(p);  // start new index.html with title and header
-    bt.trace_count = 0;
     pthread_t thread_inotify;
     pthread_t thread_telnet;
     if (pthread_create(&thread_inotify, NULL, init_inotify, (void*)&p))
@@ -75,11 +96,8 @@ int main(int argc, char **argv) {
         return 1;
     pthread_join(thread_inotify, NULL);
     pthread_join(thread_telnet, NULL);
-//    free(trace);
+    sem_close (&telnet_sem);
     exit(EXIT_SUCCESS);
-    pthread_mutex_destroy(&lock);
-
-
 }
 
 
