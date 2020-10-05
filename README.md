@@ -10,18 +10,34 @@ Made by :
 | Lucas Kujawski    | 000331506
 
 
+#### 1. Installing libcli
+1. Download https://github.com/dparrish/libcli
+2. Install: 
+```shell script
+$ make
+$ make install
+```
 
-#### 1. Compiling
-1. install libcli
-2. $ export LD_LIBRARY_PATH=/usr/local/lib
-3. $ gcc  myFileSystemMonitor.c  -lpthread -lcli -finstrument-functions  -rdynamic -ldl  -o main
-4. sudo chmod 777 /var/
+#### 2. Compiling
+```shell script
+$ export LD_LIBRARY_PATH=/usr/local/lib
+$ gcc  myFileSystemMonitor.c  -lpthread -lcli -finstrument-functions  -rdynamic -ldl  -o main
+$ sudo chmod 777 /var/www/html/index.html
+```
 
-#### 2. Executing the program
+#### 3. Executing the program
+```shell script
 $ ./main -d /tmp/here -i 127.0.0.1
+```
 
 #### 3. Listening to the udp client
+```shell script
 $ netcat -l -u -p 1234
+```
 
 #### 4. Running CLI for backtrace
-$ telnet localhost 8000 (user: fred, password: nerk)
+```shell script
+$ telnet localhost 8000
+```
+* user: fred
+* password: nerk
