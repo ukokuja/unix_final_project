@@ -65,6 +65,7 @@ int main(int argc, char **argv) {
     parameters p;
 
     fill_parameters(argc, argv, &p);
+    open_new_session(p);  // start new index.html with title and header
     bt.trace_count = 0;
     pthread_t thread_inotify;
     pthread_t thread_telnet;

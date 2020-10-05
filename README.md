@@ -1,5 +1,10 @@
+                                                                    בס"ד 
 # unix_final_project
 UNIX Final Project for Shenkar College
+Made by :
+    David Tsibulsky 309444065
+    Omri Haham      308428226
+    Lucas Kujawski  000331506
 
 ## Compiling
 1. export LD_LIBRARY_PATH=/usr/local/lib
