@@ -17,38 +17,31 @@
 
 sem_t telnet_sem;
 backtrace_s bt;
-#define BACKTRACE_LENGTH 100
-#define BUFFER_FILENAME ".buffer.txt"
+#define BACKTRACE_LENGTH 128
+#define TRACE_LINE_LENGTH 128
 void *backtrace_buffer[BACKTRACE_LENGTH];
-
-void reset_buffer_file () {
-    FILE* file = fopen(BUFFER_FILENAME, "w");
-    fclose(file);
-}
 
 void  __attribute__ ((no_instrument_function))  __cyg_profile_func_enter (void *this_fn,
                                                                           void *call_site)
 {
         if(bt.is_active == 1) {
             sem_wait(&telnet_sem);
-            FILE* file = fopen(BUFFER_FILENAME, "w");
-            fclose(file);
+            //Reset backtrace
+            free(bt.trace);
+            bt.trace = (char**)malloc(0*sizeof(char*));
             bt.trace_count = 0;
             bt.is_active = 0;
         }
         int trace_count = backtrace(backtrace_buffer, BACKTRACE_LENGTH);
         char** string = backtrace_symbols(backtrace_buffer, trace_count);
-        FILE* file = fopen(BUFFER_FILENAME, "a+");
-        if (file) {
-            for (int j = 0; j < trace_count; j++) {
-                if (strncmp(string[j], "./main", 6) == 0) {
-                    fprintf(file, "%s\n", string[j]);
-                    bt.trace_count++;
-                }
-            }
-            fclose(file);
-        }
 
+        //Copies new backtrace data to list
+        bt.trace = (char**)realloc(bt.trace, (bt.trace_count + trace_count) * sizeof(char*));
+        for (int h = 0; h < trace_count; h++) {
+            bt.trace[bt.trace_count + h] = (char*)malloc(TRACE_LINE_LENGTH*sizeof(char));
+            strcpy(bt.trace[bt.trace_count + h], string[h]);
+        }
+        bt.trace_count += trace_count;
 }
 
 #include "inotify.c"
@@ -84,10 +77,8 @@ void sig_handler(int sig) {
 
 
 int main(int argc, char **argv) {
-    reset_buffer_file();
     signal(SIGINT, sig_handler);
     signal(SIGABRT, sig_handler);
-    strcpy(bt.buffer_filename, BUFFER_FILENAME);
     if (sem_init(&telnet_sem, 0, 0) == -1){
         printf("sem_init failed\n");
         return 1;

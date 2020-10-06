@@ -1,5 +1,5 @@
 typedef struct backtrace {
+    char **trace;
     int trace_count;
-    char buffer_filename[256];
     char is_active;
 } backtrace_s;

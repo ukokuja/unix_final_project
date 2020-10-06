@@ -27,7 +27,7 @@
 #endif
 unsigned int regular_count = 0;
 unsigned int debug_regular = 0;
-
+#define LIBCLI_SUFFIX "/lib/"
 
 backtrace_s* bt_p;
 
@@ -35,26 +35,14 @@ backtrace_s* bt_p;
 int init_backtrace(struct cli_def *cli, UNUSED(const char *command), UNUSED(char *argv[]), UNUSED(int argc)) {
     bt_p->is_active = 1;
     cli_print(cli, "backtrace() returned %d addresses\n", bt_p->trace_count);
-    FILE* file = fopen(bt_p->buffer_filename, "r");
-    if (file) {
-        char line[256];
-        while (fgets(line, sizeof(line), file)) {
-            cli_print(cli, "%s", line);
+    for (int j = 0; j < bt_p->trace_count; j++) {
+        //Checking if is not in thread of libcli
+        if (strncmp(bt_p->trace[j], LIBCLI_SUFFIX, strlen(LIBCLI_SUFFIX)) < 0) {
+            cli_print(cli, "%s\n", bt_p->trace[j]);
         }
-        fclose(file);
     }
     sem_post(&telnet_sem);
 
-//    c = fgetc(bt_p->trace);
-//    while (c != EOF)
-//    {
-//        c = fgetc(bt_p->trace);
-//        cli_print(cli, "%c", c);
-//    }
-//    for (int i = 0; i < bt_p->trace_count; i++) {
-//        if (is_not_from_libcli_thread(bt_p->trace[i]))
-//            cli_print(cli, "%s", bt_p->trace[i]);
-//    }
     return CLI_OK;
 }
 
@@ -100,7 +88,7 @@ void run_child(int x) {
     // change regular update to 5 seconds rather than default of 1 second
     cli_regular_interval(cli, 5);
 
-    // set 300 second idle timeout
+    // set 180 second idle timeout
     cli_set_idle_timeout_callback(cli, 180, idle_timeout);
 
 
@@ -134,11 +122,12 @@ void* init_telnet (void *args){
 
     if ((s = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         perror("socket");
-//        return 1; // TODO: Check
+        exit(0);
     }
 
     if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on))) {
         perror("setsockopt");
+        exit(0);
     }
 
     memset(&addr, 0, sizeof(addr));
@@ -147,12 +136,12 @@ void* init_telnet (void *args){
     addr.sin_port = htons(CLITEST_PORT);
     if (bind(s, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
         perror("bind");
-//        return 1; // TODO: Check
+        exit(0);
     }
 
     if (listen(s, 50) < 0) {
         perror("listen");
-//        return 1; // TODO: Check
+        exit(0);
     }
 
     printf("Listening on port %d\n", CLITEST_PORT);
