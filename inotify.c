@@ -27,7 +27,8 @@ void* init_inotify (void *args){
     char* directory_to_be_watched = ((parameters *)args)->directory_to_be_watched;
     char* ip_address = ((parameters *)args)->ip_address;
 
-
+    threadInotify = pthread_self();
+    
     /* Step 1. Initialize inotify */
     fd = inotify_init();
     init_udp_client(ip_address, &uc);

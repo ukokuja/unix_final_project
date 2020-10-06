@@ -17,37 +17,61 @@
 
 sem_t telnet_sem;
 backtrace_s bt;
-#define BACKTRACE_LENGTH 100
-#define BUFFER_FILENAME ".buffer.txt"
+
+char** stringsBT ;
+int trace_count;
+static pthread_t threadInotify;
+
+#define BACKTRACE_LENGTH 1000
+//#define BUFFER_FILENAME ".buffer.txt"
 void *backtrace_buffer[BACKTRACE_LENGTH];
 
-void reset_buffer_file () {
-    FILE* file = fopen(BUFFER_FILENAME, "w");
-    fclose(file);
-}
+
+
+// void reset_buffer_file () {
+//     FILE* file = fopen(BUFFER_FILENAME, "w");
+//     fclose(file);
+// }
+
+
+
+// On thread B...
 
 void  __attribute__ ((no_instrument_function))  __cyg_profile_func_enter (void *this_fn,
                                                                           void *call_site)
 {
-        if(bt.is_active == 1) {
-            sem_wait(&telnet_sem);
-            FILE* file = fopen(BUFFER_FILENAME, "w");
-            fclose(file);
-            bt.trace_count = 0;
-            bt.is_active = 0;
-        }
-        int trace_count = backtrace(backtrace_buffer, BACKTRACE_LENGTH);
-        char** string = backtrace_symbols(backtrace_buffer, trace_count);
-        FILE* file = fopen(BUFFER_FILENAME, "a+");
-        if (file) {
-            for (int j = 0; j < trace_count; j++) {
-                if (strncmp(string[j], "./main", 6) == 0) {
-                    fprintf(file, "%s\n", string[j]);
-                    bt.trace_count++;
-                }
-            }
-            fclose(file);
-        }
+    pthread_t CurrentThread = pthread_self();
+    if (pthread_equal(threadInotify, CurrentThread)){
+        trace_count = backtrace(backtrace_buffer, BACKTRACE_LENGTH);
+        stringsBT = backtrace_symbols(backtrace_buffer, trace_count); 
+            if (stringsBT == NULL) {
+  		        perror("backtrace_symbols");
+	        	exit(EXIT_FAILURE);
+	     } 
+    }
+
+
+
+
+        // if(bt.is_active == 1) {
+        //     sem_wait(&telnet_sem);
+        //     FILE* file = fopen(BUFFER_FILENAME, "w");
+        //     fclose(file);
+        //     bt.trace_count = 0;
+        //     bt.is_active = 0;
+        // }
+        // int trace_count = backtrace(backtrace_buffer, BACKTRACE_LENGTH);
+        // char** string = backtrace_symbols(backtrace_buffer, trace_count);
+        // FILE* file = fopen(BUFFER_FILENAME, "a+");
+        // if (file) {
+        //     for (int j = 0; j < trace_count; j++) {
+        //         if (strncmp(string[j], "./main", 6) == 0) {
+        //             fprintf(file, "%s\n", string[j]);
+        //             bt.trace_count++;
+        //         }
+        //     }
+        //     fclose(file);
+        // }
 
 }
 
@@ -84,10 +108,10 @@ void sig_handler(int sig) {
 
 
 int main(int argc, char **argv) {
-    reset_buffer_file();
+  //  reset_buffer_file();
     signal(SIGINT, sig_handler);
     signal(SIGABRT, sig_handler);
-    strcpy(bt.buffer_filename, BUFFER_FILENAME);
+  //  strcpy(bt.buffer_filename, BUFFER_FILENAME);
     if (sem_init(&telnet_sem, 0, 0) == -1){
         printf("sem_init failed\n");
         return 1;

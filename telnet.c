@@ -33,17 +33,21 @@ backtrace_s* bt_p;
 
 
 int init_backtrace(struct cli_def *cli, UNUSED(const char *command), UNUSED(char *argv[]), UNUSED(int argc)) {
-    bt_p->is_active = 1;
+  //  bt_p->is_active = 1;
     cli_print(cli, "backtrace() returned %d addresses\n", bt_p->trace_count);
-    FILE* file = fopen(bt_p->buffer_filename, "r");
-    if (file) {
-        char line[256];
-        while (fgets(line, sizeof(line), file)) {
-            cli_print(cli, "%s", line);
-        }
-        fclose(file);
-    }
-    sem_post(&telnet_sem);
+
+	for (int j = 0; j < trace_count ; j++)
+	  cli_print(cli,"%s\n", stringsBT[j]);
+    // FILE* file = fopen(bt_p->buffer_filename, "r");
+    // if (file) {
+    //     char line[256];
+    //     while (fgets(line, sizeof(line), file)) {
+    //         cli_print(cli, "%s", line);
+    //     }
+    //     fclose(file);
+    // }
+    // sem_post(&telnet_sem);
+
 
 //    c = fgetc(bt_p->trace);
 //    while (c != EOF)
