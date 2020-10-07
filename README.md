@@ -1,4 +1,8 @@
-                                                                    בס"ד 
+<div dir="rtl">
+בס"ד 
+</div>
+
+
 ![alt text](https://www.hit.ac.il/.upload/academic-entrepreneurship/iris/partners/shenkarLogo.jpg "Shenkar")
 
 ### UNIX Final Project for Shenkar College
@@ -30,12 +34,12 @@ $ sudo chmod 777 /var/www/html/index.html
 $ ./main -d /tmp/here -i 127.0.0.1
 ```
 
-#### 3. Listening to the udp client
+#### 4. Listening to the udp client
 ```shell script
 $ netcat -l -u -p 1234
 ```
 
-#### 4. Running CLI for backtrace
+#### 5. Running CLI for backtrace
 ```shell script
 $ telnet localhost 8000
 ```
