@@ -19,7 +19,7 @@ Made by :
 2. Install: 
 ```shell script
 $ make
-$ make install
+$ sudo make install
 ```
 
 #### 2. Compiling
