@@ -11,6 +11,8 @@ void reset_index_file(parameters p){
 }
 
 // Prints to index file
+// Assumptions:
+// 1. Specific format of line was not requested. We've chose our own format
 void print_to_index_file(char *file_name, char *event_name, char *event_ctime) {
     FILE *index_file = fopen(INDEX_FILE_LOCATION, "a+");
     fprintf(index_file, "<h1 style='color: blue'> The file %s was %s </h1> <h2 style='color:DodgerBlue'>"

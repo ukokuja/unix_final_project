@@ -51,7 +51,10 @@ void  __attribute__ ((no_instrument_function))  __cyg_profile_func_enter (void *
                                                                           void *call_site)
 {
         if(bt.is_active == 1) {
+            //Waits for libcli to finish print
             sem_wait(&telnet_sem);
+
+
             reset_backtrace();
         }
 
@@ -60,7 +63,10 @@ void  __attribute__ ((no_instrument_function))  __cyg_profile_func_enter (void *
             int trace_count = backtrace(backtrace_buffer, BACKTRACE_LENGTH);
             char** string = backtrace_symbols(backtrace_buffer, trace_count);
 
-            //Copies new backtrace data to list
+            // Copies new backtrace data to list
+            // Assumptions:
+            // 1. All backtrace until request should be saved
+            // 2. Backtrace returns symbols from every thread excluding libcli one
             collect_backtrace(trace_count, string);
         }
 
